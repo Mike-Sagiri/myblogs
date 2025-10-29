@@ -1,6 +1,7 @@
 ---
 layout: post
 title: docker的可视化及远程连接时的可视化
+author: xjh
 date: 2025-10-28 12:47 +0800
 categories: [技术经验, 远程服务]
 tags: [ssh] # TAG 名称应始终为小写
@@ -20,6 +21,8 @@ docker run -it  \
  osrf/ros:humble-desktop-full
 ```
 这里以运行一个ROS2镜像为例，`-e`将`DISPLAY`环境变量映射到容器内，`-v`将X11的本地套接字映射到容器内，这样容器就可以调用本机的X11 server来进行图形化显示了。
+![alt text](assets/img/docker-gui/localx11.png)
+_gedit的边缘是直角的_
 
 只使用Wayland可视化的命令如下所示：
 ```shell
@@ -30,26 +33,70 @@ docker run -it --network host --name ros2 \
  osrf/ros:humble-desktop-full
 ```
 这里除了类似的环境变量和套接字映射以外，还增加了`--network host`，意思是让docker容器使用主机的网络（相同ip）。就Wayland显示而言，这是不必要的。
+![alt text](assets/img/docker-gui/localwayland.png)
+_gedit的边缘是圆角的_
+![alt text](assets/img/docker-gui/localwayland_x11gui.png)
+_X11程序无法显示_
+> 此时是无法显示X11程序的，例如rviz（即使你的容器内安装了XWayalnd，由于容器是通过访问主机接口实现显示的，依然无法运行）
+{: .prompt-warning }
 
-也可以将上面两个命令组合起来，就可以得到一个既能使用X11显示的，又能使用Wayland显示的容器了。对于gedit这种兼容两种显示接口的程序，会优先使用Wayland显示。
+> 也可以将上面两个命令组合起来，就可以得到一个既能使用X11显示的，又能使用Wayland显示的容器了。对于gedit这种兼容两种显示接口的程序，会优先使用Wayland显示。
+{: .prompt-info }
 
 ### Windows
 对于Windows而言，基于WSL后端的docker与Ubuntu中的docker是类似的。只是命令需要稍微有所改变。由于显示所需的X11和Wayland都在WSL目录里，所以需要将所有路径前面加上`/run/desktop/mnt/host/wslg`，完整的命令如下所示：
 ```shell
 docker run -it --rm --name foxy --net host \
  -v /run/desktop/mnt/host/wslg/.X11-unix:/tmp/.X11-unix \
- -v /run/desktop/mnt/host/wslg:/mnt/wslg \ 
- -e DISPLAY=:0 -e WAYLAND_DISPLAY=wayland-0 \ 
- -e XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir \ 
- -e PULSE_SERVER=/mnt/wslg/PulseServer \ 
+  -v /run/desktop/mnt/host/wslg:/mnt/wslg \
+ -e DISPLAY=:0 -e WAYLAND_DISPLAY=wayland-0 \
+ -e XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir \
+ -e PULSE_SERVER=/mnt/wslg/PulseServer \
  osrf/ros:humble-desktop-full
 ```
 这里路径是写死的，代表一种默认情况。因为你无法在Windows终端里访问WSL的环境变量。但是Windows的docker提供了能在WSL终端内访问的接口，可以在WSL内的终端运行，如下所示：
 ```shell
-docker run -it --rm --net=host \ 
--e WAYLAND_DISPLAY -e XDG_RUNTIME_DIR \ 
--v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY \ 
--e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \ 
--e PULSE_SERVER -v /mnt/wslg/PulseServer:/mnt/wslg/PulseServer \ 
+docker run -it --rm --net=host \
+-e WAYLAND_DISPLAY -e XDG_RUNTIME_DIR \
+-v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY \
+-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix \
+-e PULSE_SERVER -v /mnt/wslg/PulseServer:/mnt/wslg/PulseServer \
 osrf/ros:humble-desktop-full
 ```
+
+### macos
+macos没有X11服务端，因此只能通过安装XQuartz来实现X11。安装好后，运行如下命令：
+```shell
+docker run -it --rm --net=host -e DISPLAY=<你的ip>:0 -v ~/.Xauthority:/root/.Xauthority osrf/ros:humble-desktop-full
+```
+> 值得注意的是，由于XQuartz的功能很不完善，如上所示的命令启动一个ROS镜像后，RVIZ是打不开的。
+{: .prompt-warning }
+
+## 远程主机上运行docker命令的可视化
+
+由于远程主机基本都是Linux系统，所以这里以Ubuntu为例。这里涉及到两方面：
+* 本地主机显示远程主机的画面
+* 远程主机显示docker容器的画面
+同时，由于X11与Wayland的区别，我们分开讨论。建议提前阅读：[ssh连接到远程的gui使用](../ssh_gui)
+
+### X11
+基于X11的服务与客户端模型，完全基于X11的显示，首先需要`ssh -CY`连接到远程主机，并构建X11转发（`ssh -CY`自动完成）。随后，构建docker容器内的X11可视化。这里，不能直接映射`/tmp/.X11-unix`套接字，因为这样容器访问的是远程主机的X11服务，而非`ssh -CY`构建的转发服务。因此，需要将套接字映射改为权限映射`-v ~/.Xauthority:/root/.Xauthority`，同时由于`ssh -CY`已经设置好了环境变量`DISPLAY`，所以docker可视化命令为：
+```shell
+docker run -it --rm --net=host -e DISPLAY -v ~/.Xauthority:/root/.Xauthority osrf/ros:humble-desktop-full
+```
+这里的`--net=host`是必须的，因为容器需要通过tcp网络通信来访问X11服务。
+![alt text](assets/img/docker-gui/remotex11.png)
+_远程主机docker镜像的gedit，基于x11显示，边缘是直角_
+> 此时，如果docker容器使用Wayland接口，是无法显示的。因为ssh构建的转发服务是独立于远程主机的XWayland的。
+{: .prompt-warning }
+### Wayland
+使用Wayland进行显示，需要`waypipe`工具。这方面的使用可以参考上面提到的建议阅读。此时，由于`waypipe`是完全利用Wayland进行显示，因此远程主机的XWayland也是可以正常转发的。所以，最完善的docker可视化命令为：
+```shell
+docker run -it --rm --net=host -e WAYLAND_DISPLAY -e XDG_RUNTIME_DIR -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:$XDG_RUNTIME_DIR/$WAYLAND_DISPLAY -e DISPLAY -v ~/.Xauthority:/root/.Xauthority osrf/ros:humble-desktop-full
+```
+这样，就既可以显示X11程序，又可以显示Wayland程序。
+![alt text](assets/img/docker-gui/remotewayland.png)
+_远程主机docker镜像的gedit，基于Wayland显示，边缘是圆角_
+
+> 此时，诸如RVIZ之类的程序也是可以运行的。
+{: .prompt-info }
