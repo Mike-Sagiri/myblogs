@@ -4,7 +4,7 @@ title: docker的可视化及远程连接时的可视化
 author: xjh
 date: 2025-10-28 12:47 +0800
 categories: [技术经验, 远程服务]
-tags: [ssh] # TAG 名称应始终为小写
+tags: [ssh, docker] # TAG 名称应始终为小写
 ---
 
 ## 本地主机上运行docker容器的可视化
