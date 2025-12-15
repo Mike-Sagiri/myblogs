@@ -51,6 +51,6 @@ IAsyncAction DoWorkAsync(TextBlock textblock)
 不然肯定会出现各种各样的奇怪bug。
 
 ## 构建
-记得用release构建，那快得多。因为没用到Assets/，可以把它删了。同时一系列调试用的文件也可以删掉。但是如果你不选择打包的话，你需要Windows App Runtime。
+记得用release构建，那快得多。因为没用到Assets/，可以把它删了。同时一系列调试用的文件也可以删掉。但是如果你不选择打包的话，你需要[Windows App Runtime](https://apps.microsoft.com/detail/9pcmpl33xp5m?hl=zh-CN&gl=CN)，或者[Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
 
 
