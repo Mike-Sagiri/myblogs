@@ -64,6 +64,11 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 export FASTRTPS_DEFAULT_PROFILES_FILE=/path/to/your/file.xml
 ```
+如果是ros2 rolling等humble后的版本，`FASTRTPS_DEFAULT_PROFILES_FILE`将被弃用，因此需改为：
+```bash
+export FASTDDS_DEFAULT_PROFILES_FILE=/path/to/your/file.xml
+```
+
 > 这虽然不是ROS2官方的写法，但是添加的`network_filter`项非常好用，会事先检查目标是否在同一子网，不在就不发，提高网络利用效率，在传图像的时候十分有用
 {: .prompt-info }
 
