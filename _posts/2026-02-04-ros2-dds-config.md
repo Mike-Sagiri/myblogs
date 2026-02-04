@@ -12,6 +12,11 @@ tags: [ros2, dds, network] # TAG 名称应始终为小写
 1. [fastdds documentation](https://fast-dds.docs.eprosima.com/en/latest/fastdds/transport/interfaces.html)
 2. [cyclonedds documentation](https://cyclonedds.io/docs/cyclonedds/0.10.5/config/cyclonedds_specifics.html#network-and-discovery-configuration)
 3. [husarnet](https://husarnet.com/docs/ros2/custom-cyclonedds-xml)
+4. [ROS2 DDS Config Example](https://github.com/ros2/ros2_dds_profiles_examples/tree/main)这个样例很丰富，可以直接用
+5. [2.6.11 FastDDS Interface Documentation](https://fast-dds.docs.eprosima.com/en/v2.6.11/fastdds/transport/whitelist.html?highlight=interface)
+6. [2.13.6 FastDDS Interface Documentation](https://fast-dds.docs.eprosima.com/en/v2.13.6/fastdds/transport/whitelist.html)
+7. [3.4.2 FastDDS Interface Documentation](https://fast-dds.docs.eprosima.com/en/latest/fastdds/transport/whitelist.html#whitelist-interfaces)
+8. [3.4.2 FastDDS Interfaces Configuation](https://fast-dds.docs.eprosima.com/en/latest/fastdds/transport/interfaces.html#ifaces-config)
 
 首先，需要知道如何指定中间件，使用环境变量：
 ```bash
@@ -31,8 +36,13 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
             <type>UDPv4</type>
             <interfaces>
                 <allowlist>
-                    <interface name="eth0"/>
+                    <interface name="eth0" netmask_filter="ON"/>
+                    <interface name="192.168.1.10" netmask_filter="OFF"/>
                 </allowlist>
+                <blocklist>
+                    <interface name="127.0.0.1"/>
+                    <interface name="docker0"/>
+                </blocklist>
             </interfaces>
         </transport_descriptor>
     </transport_descriptors>
@@ -52,12 +62,69 @@ export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 然后修改环境变量，使之生效。
 ```bash
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
-export FASTDDS_DEFAULT_PROFILES_FILE=/path/to/your/file.xml
+export FASTRTPS_DEFAULT_PROFILES_FILE=/path/to/your/file.xml
+```
+> 这虽然不是ROS2官方的写法，但是添加的`network_filter`项非常好用，会事先检查目标是否在同一子网，不在就不发，提高网络利用效率，在传图像的时候十分有用
+{: .prompt-info }
+
+请注意，部分教程会添加：
+```bash
 export RMW_FASTRTPS_USE_QOS_FROM_XML=1
+```
+***不要这么做***，除非需要自定义不同话题走不同的中间件或者接口这样复杂的需求，不然修改它会出现`NotEnoughMemory`和`buffer`的问题。  
+
+***另请注意***，上述方法只在最新版的fastdds有效，目前是3.4X版本。ros2 humble默认的版本是2.6.11，这个版本不支持`interface`标签，必须指定ip。如下所示：
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+    <transport_descriptors>
+        <transport_descriptor>
+            <transport_id>udp_transport</transport_id>
+            <type>UDPv4</type>
+            <interfaceWhiteList>
+                <address>192.168.1.61</address>
+            </interfaceWhiteList>
+        </transport_descriptor>
+    </transport_descriptors>
+
+    <participant profile_name="default_part_profile" is_default_profile="true">
+        <rtps>
+            <useBuiltinTransports>false</useBuiltinTransports>
+            <userTransports>
+                <transport_id>udp_transport</transport_id>
+            </userTransports>
+        </rtps>
+    </participant>
+</profiles>
+```
+在2.X版本末期，添加了`interface`的支持，可以这么写：
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+    <transport_descriptors>
+        <transport_descriptor>
+            <transport_id>udp_transport</transport_id>
+            <type>UDPv4</type>
+            <interfaceWhiteList>
+                <interface>eth0</interface>
+            </interfaceWhiteList>
+        </transport_descriptor>
+    </transport_descriptors>
+
+    <participant profile_name="default_part_profile" is_default_profile="true">
+        <rtps>
+            <useBuiltinTransports>false</useBuiltinTransports>
+            <userTransports>
+                <transport_id>udp_transport</transport_id>
+            </userTransports>
+        </rtps>
+    </participant>
+</profiles>
+这种写法直到3.X版本依然有效。
 ```
 
 ## CycloneDDS配置
-一样的，首先需要编写一个xml文件。但是不一样的是，cyclonedds可以直接把xml文件的内容作为环境变量给出。
+一样的，首先需要编写一个xml文件。但是不一样的是，cyclonedds可以直接把xml文件的内容作为环境变量给出，并且配置更为简单。
 ```bash
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 export CYCLONEDDS_URI='<CycloneDDS><Domain><General><Interfaces>
@@ -75,6 +142,14 @@ export CYCLONEDDS_URI='<CycloneDDS><Domain><General>
                         <AllowMulticast>false</AllowMulticast>
                        </General></Domain></CycloneDDS>'
 ```
+
+## 验证
+可以将网卡设置为一个不存在的网卡或者ip，再打开`rviz2`，正常的话会报错，说明生效了。
+![alt text](assets/img/ros2-dds/fastdds.png)
+_FastDDS的报错信息，虽然报错但是rviz2可以打开_
+
+![alt text](assets/img/ros2-dds/cyclonedds.png)
+_CycloneDDS的报错信息，rviz2无法正常打开_
 
 ## 使用wsl和docker的常见问题
 如果wsl或者docker使用宿主机网络，而非NAT桥接，已知会有如下的问题。
