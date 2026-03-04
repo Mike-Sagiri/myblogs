@@ -89,6 +89,9 @@ docker info | grep -i runtime
 ```bash
 docker pull nvcr.io/nvidia/pytorch:24.09-py3-igpu
 docker run -it --rm --runtime=nvidia --gpus all nvcr.io/nvidia/pytorch:24.09-py3-igpu
+
+# only use if SHMEM warning
+docker run -it --rm --runtime=nvidia --gpus all --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 nvcr.io/nvidia/pytorch:24.09-py3-igpu
 ```
 这里注意与直接`--gpus all`不一样。否则会出现报错，让你不能`directly invoke like --gpus all`类似这种。这里我直接使用官方的pytorch镜像了，里面包含torch，torchvision，tensorrt，都是gpu版。
 
