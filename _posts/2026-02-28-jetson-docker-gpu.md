@@ -114,6 +114,9 @@ docker run -it --rm --runtime=nvidia --gpus all --ipc=host --ulimit memlock=-1 -
 > 部分官方的镜像对driver作了严格的限制，cuda版本也与jetson上的driver不兼容。因此有人`apt install nvidia-jetpack`手动安装了更高版本的。但是还是报不兼容，并且driver还是旧版。但是官方回答说是一个已知的问题，不影响使用。详细的说明可以参考[官方的回答](https://forums.developer.nvidia.com/t/jetpack-6-1-upgrade-issue-host-stuck-on-driver-540-4-0-despite-successful-apt-upgrade/354467)。
 {: .prompt-info }
 
+> 旧版的jetpack，如6.1会与新版28+的docker的网络设置有冲突，具体为iptables相关报错。此时可以考虑降级docker到27，或者升级jetpack到6.2。升级jetpack的方式为：[英伟达官方](https://docs.nvidia.com/jetson/jetpack/install-setup/index.html#upgrade-jetpack)。6.1对应的为36.4，6.2对应36.5。所以，按照教程，改成5即可。（官网虽然更新到了6.2.1，但是升级相关表述还停留在6.1.1，需要格外注意，按照本文所述的对应版本即可）。
+{: .prompt-info }
+
 ```bash
 ls -la /dev/nvidia*
 ```
