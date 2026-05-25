@@ -10,9 +10,10 @@ tags: [nvidia, jetson orin nx, docker] # TAG 名称应始终为小写
 
 参考：
 1. [csdn](https://blog.csdn.net/zhuyonghou/article/details/153562227)
-2. [英伟达docker镜像](https://catalog.ngc.nvidia.com/?tab=container)
-3. [jetson pytorch](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch?version=r35.2.1-pth2.0-py3)
-4. [jetson tensorrt](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-tensorrt?version=r10.3.0-devel)
+2. [nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)
+3. [英伟达docker镜像](https://catalog.ngc.nvidia.com/?tab=container)
+4. [jetson pytorch](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-pytorch?version=r35.2.1-pth2.0-py3)
+5. [jetson tensorrt](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/l4t-tensorrt?version=r10.3.0-devel)
 上面两个不再更新了，说是变成了[pytorch](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch?version=26.02-py3)和[tensorrt](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorrt?version=26.02-py3)。
 
 ## 系统检查与docker安装
@@ -73,6 +74,8 @@ sudo groupadd docker
 ```bash
 sudo apt-get install -y nvidia-container-toolkit
 ```
+
+如果提示未找到包，可以直接访问[nvidia-container-toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html)，按照教程添加软件源并安装。
 
 验证安装：
 
