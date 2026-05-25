@@ -56,6 +56,16 @@ wget http://fishros.com/install -O fishros && . fishros
 ```
 docker安装完后要重启或者log out再登录，刷新用户组。
 
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+第一步是将当前用户加入docker组，第二步是刷新docker组。如果提示没有docker用户组，可以手动添加一个：
+
+```bash
+sudo groupadd docker
+```
+
 ## Nvidia Container Toolkit
 
 ### 安装NVIDIA容器工具包
