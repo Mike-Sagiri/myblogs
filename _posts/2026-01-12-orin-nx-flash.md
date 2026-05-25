@@ -29,6 +29,7 @@ tags: [nvidia, jetson orin nx] # TAG 名称应始终为小写
 3. 如果使用vmware虚拟机，请将usb控制器的兼容性改成3.0。不然可能会报：没有合适的控制器之类的错误。
 4. 如果你的orin上电不自动开机，请检查是不是用杜邦线，把DISABLE AUTO ON两个引脚给连起来了。
 5. 日志里输出Flash is success就成功了，有时候sdk manager在这一步之后会卡住，但是不影响orin的刷写。
+6. **如果只是安装SDK，不能进入Orin的恢复模式，而需要系统正常启动**。
 
 ### 降级刷写补丁安装教程
 
