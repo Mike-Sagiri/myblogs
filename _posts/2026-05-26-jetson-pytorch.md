@@ -11,12 +11,24 @@ tags: [nvidia, jetson orin nx, pytorch] # TAG 名称应始终为小写
 ## 一键预编译安装
 英伟达预编译了一些版本的pytorch，安装最简便，但是版本可供选择较少，不够灵活：[英伟达官方论坛](https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048)：这个是最简单的，预编译的pytorch、torchvision、torchaudio。
 
+![alt text](assets/img/jetson-pytorch/nvidia_forum.png)
+_英伟达官方论坛的预编译包_
+
 ## 手动下载安装预编译包
 英伟达提供了一些版本的pytorch，但是需要一些繁琐的步骤确认兼容性，适用于直到jetson thor的jetpack7，但是有些描述比较老旧。我们一步步来：[英伟达官方教程](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html)
 
 例如，作者需要在jetson orin，jetpack 6.2.2，cuda12.6安装pytorch，大体可以按照文中的来。但是文中提到的cusparselt的安装脚本，最高支持到cuda12.4，因此我们选择手动安装。访问：[cusparselt安装地址](https://developer.nvidia.com/cusparselt-downloads)。这里作者安装的是0.8.1版本，这个版本有一个专门的jetson架构的选项，然后按照说明，安装cuda-12的版本即可。
 
+![alt text](assets/img/jetson-pytorch/cusparselt.png)
+_cuSPARSELT的安装界面，注意安装cuda-12后缀版本，不要直接安装不带后缀的版本（除非你使用cuda13）_
+
+> 从0.9.0版本开始，不再提供jetson-aarch的版本，官方称需要迁移到Arm64 (SBSA)。[发行记录](https://docs.nvidia.com/cuda/cusparselt/release_notes.html)
+{: .prompt-warning }
+
 后续关于pytorch的安装，从24.09起，也就是torch2.5，英伟达没有提供预编译好的pytorch，如果需要新版本的pytorch，可以后续手动源码编译，或者docker安装。[这里](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform-release-notes/pytorch-jetson-rel.html#pytorch-jetson-rel)提供了兼容性说明。表格中的[Wheel](https://developer.download.nvidia.com/compute/redist/jp/)和[Container](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch)提供了所有英伟达提供的项目列表。
+
+![alt text](assets/img/jetson-pytorch/capability.png)
+_预编译docker镜像、pytorch wheel与jetpack的兼容性_
 
 ## Docker安装
 英伟达为jetson系列制作了一系列docker镜像，包含tensorrt、pytorch等应有尽有，是最简便的安装方式。参考[笔者之前的文章](../jetson-docker-gpu)。
@@ -81,6 +93,23 @@ export USE_NINJA=1
 export PYTORCH_BUILD_VERSION=<version> #e.g., 2.10.0
 export PYTORCH_BUILD_NUMBER=1
 ```
+
+我使用的编译完整参数：
+```bash
+PyTorch built with:
+  - GCC 11.4
+  - C++ Version: 201703
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - LAPACK is enabled (usually provided by MKL)
+  - NNPACK is enabled
+  - CPU capability usage: DEFAULT
+  - CUDA Runtime 12.6
+  - NVCC architecture flags: -gencode;arch=compute_87,code=sm_87
+  - CuDNN 90.3
+  - Build settings: BLAS_INFO=open, BUILD_TYPE=Release, COMMIT_SHA=449b1768410104d3ed79d3bcfe4ba1d65c7f22c0, CUDA_VERSION=12.6, CUDNN_VERSION=9.3.0, CXX_COMPILER=/usr/bin/c++, CXX_FLAGS= -ffunction-sections -fdata-sections -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_PYTORCH_QNNPACK -DAT_BUILD_ARM_VEC256_WITH_SLEEF -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -DC10_NODEPRECATED -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=range-loop-construct -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -faligned-new -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, FORCE_FALLBACK_CUDA_MPI=1, LAPACK_INFO=open, TORCH_VERSION=2.10.0, USE_CUDA=1, USE_CUDNN=1, USE_CUSPARSELT=ON, USE_EIGEN_FOR_BLAS=ON, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=OFF, USE_MKLDNN=0, USE_MPI=ON, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, USE_XCCL=OFF, USE_XPU=OFF
+```
+> 这**不是**最合适的参数，我错误的启用了USE_NCCL=1，但事实上，jetson上完全不需要它，它与并行训练有关。但是这个编译参数可以让pytorch2.10正确地运行在jetson orin上。
+{: .prompt-warning }
 
 然后下载pytorch源码：
 ```bash
