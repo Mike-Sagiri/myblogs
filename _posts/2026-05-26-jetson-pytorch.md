@@ -54,7 +54,8 @@ pip install -v . --no-build-isolation
 后者的一般命令为：
 
 ```bash
-python -m build --wheel --no-isolation #new version
+python -m build --wheel --no-isolation #new version, without source code
+python -m build --no-isolation #new version, with source code
 python setup.py bdist_wheel #old version, recommended for jetson+pytorch
 pip wheel . -v -w dist --no-build-isolation #recommended for jetson
 ```
@@ -105,6 +106,8 @@ python setup.py bdist_wheel
 ```
 得到wheel之后，pip install即可。
 
+> 可以使用如下命令检查pytorch是否启用了cuDNN、cuSPARSELT：`print(torch.__config__.show())`。新版本也可以：`print(torch.backends.cudnn.enabled)`、`print(torch.backends.cuda.cusparselt.is_available())`
+{: .prompt-info }
 
 ### Torchivision源码编译
 
@@ -148,6 +151,13 @@ python -m pip install "setuptools<82"
 
 ### ERROR: Could not find a version that satisfies the requirement mkl-static
 arm架构本就不支持它，编译pytorch时加上`export USE_MKLDNN=0`即可。
+
+### fatal error: torch/csrc/stable/xxx.h: No such file or directory
+如果确认pytorch已经正常安装了，这是因为曾经在`sudo`下编译过，导致构建缓存异常，运行如下命令删掉：
+```bash
+python setup.py clean
+rm -rf build/ dist/ torchaudio.egg-info
+```
 
 > 千问在解决这些问题挺好用，而且jetson上访问比较容易，可以问问它。
 {: .prompt-info }
