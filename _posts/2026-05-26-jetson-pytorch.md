@@ -14,6 +14,9 @@ tags: [nvidia, jetson orin nx, pytorch] # TAG 名称应始终为小写
 ![alt text](assets/img/jetson-pytorch/nvidia_forum.png)
 _英伟达官方论坛的预编译包_
 
+> [JPL仓库](https://pypi.jetson-ai-lab.io/jp6/cu126)提供了更多预编译好的包，需要自行寻找匹配的包。
+{: .prompt-warning }
+
 ## 手动下载安装预编译包
 英伟达提供了一些版本的pytorch，但是需要一些繁琐的步骤确认兼容性，适用于直到jetson thor的jetpack7，但是有些描述比较老旧。我们一步步来：[英伟达官方教程](https://docs.nvidia.com/deeplearning/frameworks/install-pytorch-jetson-platform/index.html)
 
@@ -135,7 +138,7 @@ python setup.py bdist_wheel
 ```
 得到wheel之后，pip install即可。
 
-> 可以使用如下命令检查pytorch是否启用了cuDNN、cuSPARSELT：`print(torch.__config__.show())`。新版本也可以：`print(torch.backends.cudnn.enabled)`、`print(torch.backends.cuda.cusparselt.is_available())`
+> 可以使用如下命令检查pytorch是否启用了cuDNN、cuSPARSELT：`print(torch.__config__.show())`。新版本也可以：`print(torch.backends.cudnn.enabled)`、`print(torch.backends.cusparselt.is_available())`
 {: .prompt-info }
 
 ### Torchivision源码编译
@@ -147,6 +150,9 @@ python setup.py bdist_wheel
 Torchaudio官方给出了源码编译的[教程](https://docs.pytorch.org/audio/stable/build.jetson.html)。教程都比较老，只考虑编译Torchaudio的代码即可。注意，教程里的`--no-use-pep517`已经在新版的pip中移除，请使用`--no-build-isolation`。
 
 老版本的Torchaudio可能会报一个`FLT_MAX undefined`的问题。因为从cuda12.6起，需要显式`#include "float.h"`才能使用这些预定义宏。所以在`audio`源码下找一个叫`ctc_prefix_decoder_kernel_vx.cu`的文件，其中`vx`是版本号。在最前方加上`#include "float.h"`即可。
+
+![alt text](assets/img/jetson-pytorch/final_results.png)
+_最终安装结果_
 
 ## 常见问题
 
