@@ -1,6 +1,6 @@
 ---
 layout: post
-title: jetson-pytorch
+title: 为jetson系列安装GPU版pytorch家族
 date: 2026-05-26 19:48 +0800
 categories: [技术经验, 英伟达, Jetson Orin]
 tags: [nvidia, jetson orin nx, pytorch] # TAG 名称应始终为小写
