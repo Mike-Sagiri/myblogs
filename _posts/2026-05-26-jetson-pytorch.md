@@ -80,6 +80,9 @@ pip wheel . -v -w dist --no-build-isolation #recommended for jetson
 export USE_CUDA=1
 export USE_CUDNN=1
 
+#export USE_SVE=0
+#export BUILD_IGNORE_SVE_UNAVAILABLE=1 #2.12版的torch把CUDNN和SVE支持都开了，这样设置防止报错
+
 export USE_NCCL=0
 export USE_DISTRIBUTED=0
 
