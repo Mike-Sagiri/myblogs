@@ -84,7 +84,7 @@ export USE_CUDNN=1
 #export BUILD_IGNORE_SVE_UNAVAILABLE=1 #2.12版的torch把CUDNN和SVE支持都开了，这样设置防止报错
 
 export USE_NCCL=0
-export USE_DISTRIBUTED=0
+#export USE_DISTRIBUTED=0 #有些库会依赖它，比如torch-tensorrt，最好开开设置为1
 
 export USE_QNNPACK=0
 export USE_PYTORCH_QNNPACK=0
