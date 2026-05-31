@@ -148,6 +148,19 @@ export CYCLONEDDS_URI='<CycloneDDS><Domain><General>
                        </General></Domain></CycloneDDS>'
 ```
 
+如果想指定IP而不是网卡，可以：
+```bash
+# New
+export CYCLONEDDS_URI='<CycloneDDS><Domain><General><Interfaces>
+                            <NetworkInterface address="192.168.1.61" priority="default" multicast="default" />
+                        </Interfaces></General></Domain></CycloneDDS>'
+# Old
+export CYCLONEDDS_URI='<CycloneDDS><Domain><General>
+                        <NetworkInterfaceAddress>192.168.1.61</NetworkInterfaceAddress>
+                        <AllowMulticast>false</AllowMulticast>
+                       </General></Domain></CycloneDDS>'
+```
+
 ## 验证
 可以将网卡设置为一个不存在的网卡或者ip，再打开`rviz2`，正常的话会报错，说明生效了。
 ![alt text](assets/img/ros2-dds/fastdds.png)
@@ -160,5 +173,9 @@ _CycloneDDS的报错信息，rviz2无法正常打开_
 如果wsl或者docker使用宿主机网络，而非NAT桥接，已知会有如下的问题。
 1. fastdds无法将话题发送，即使关闭防火墙和开启主机地址环回。但是这并不一定能复现，许多情况下fastdds可以正常工作。
 2. cyclonedds内存泄漏，将非分页缓冲区占用大量空间。这一定能复现，如果使用cyclonedds，和wsl内部的docker，并使用宿主网络，当使用rviz2可视化gazebo的相机的时候，就会复现。表现为rviz2可视化的相机不显示画面或者非常卡顿。非分页缓冲区迅速增大。可以改成fastdds解决此问题。
+
+>前两个问题已经在作者[新一篇文章](../wsl-docker-ros2-dds)中详细描述和解决。
+{: .prompt-info }
+
 3. ros2 topic list等无反应。这不是中间件的问题，而是wsl的问题，时至今日仍然没有修复。使用ros2 daemon start即可解决。
 4. 无法通过127.0.0.1访问wsl或docker内部端口。在确信已经开启镜像或者宿主网络模式之后，这大概是因为没有在wsl setting开启主机地址环回。
