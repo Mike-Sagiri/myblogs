@@ -19,6 +19,12 @@ Torch-TensorRT是一个结合了Pytorch和TensorRT的库，可以便捷地将tor
 2. setup.py：决定编译好的wheel的依赖
 3. third_party/tensorrt/local/BUILD：决定TensorRT依赖库的文件匹配
 
+修改好后，使用
+```bash
+python setup.py bdist_wheel --jetpack
+```
+编译出.whl文件，放在dist目录下，pip install ./*.whl即可
+
 下面一次介绍需要的修改：
 
 ## MODULE.bazel
