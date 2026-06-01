@@ -162,7 +162,7 @@ _最终安装结果_
 ### RuntimeError: operator torchvision::nms does not exist
 需要退出torchvision的源码目录再import，否则会导入当前目录下的未编译的torchvision
 
-### identifier "FLT_MAX" is undefined
+### Torchaudio编译报错：identifier "FLT_MAX" is undefined
 audio/src/libtorchaudio/cuctc/src/ctc_prefix_decoder_kernel_v2.cu这个文件要加上`#include "float.h"`
 
 ### 在系统python下安装torch，但切进conda环境后仍然可见
@@ -184,26 +184,26 @@ setuptools 的里程碑式大版本更新（82.0.0及以上）中，官方正式
 python -m pip install "setuptools<82"
 ```
 
-### no such option --no-use-pep517
+### Torchaudio编译报错：no such option --no-use-pep517
 新版pip已经移除了，使用`--no-build-isolation`替代。
 
-### ERROR: Could not find a version that satisfies the requirement mkl-static
+### Pytorch依赖MKL库下载报错：ERROR: Could not find a version that satisfies the requirement mkl-static
 arm架构本就不支持它，编译pytorch时加上`export USE_MKLDNN=0`即可。
 
-### fatal error: torch/csrc/stable/xxx.h: No such file or directory
+### Torchaudio编译报错：fatal error: torch/csrc/stable/xxx.h: No such file or directory
 如果确认pytorch已经正常安装了，这是因为曾经在`sudo`下编译过，导致构建缓存异常，运行如下命令删掉：
+```bash
+python setup.py clean
+rm -rf build/ dist/ torchaudio.egg-info
+```
 
-### raise ValueError('could not identify license file ' ValueError: could not identify license file xxx)
+### Pytorch编译报错：raise ValueError('could not identify license file ' ValueError: could not identify license file xxx)
 安装最新的2.12版本的torch的时候，third_party里有些包，例如vcpkg，的LICENSE无法被识别为常见的LICENSE，导致build wheel的时候报错。最简单的方式就是就是改掉对应包的`build_bundled.py`的
 ```python
 except ValueError:
     ident = None
 ```
 
-```bash
-python setup.py clean
-rm -rf build/ dist/ torchaudio.egg-info
-```
 
 > 千问在解决这些问题挺好用，而且jetson上访问比较容易，可以问问它。
 {: .prompt-info }
