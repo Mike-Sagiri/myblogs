@@ -6,6 +6,10 @@ categories: [技术经验, 英伟达, Jetson Orin]
 tags: [nvidia, jetson orin nx, pytorch, tensorrt] # TAG 名称应始终为小写
 ---
 
+> 最新的Jetpack 7.2+增加了对orin的支持，并且提供了cuda13，将统一化为Linux SBSA格式。
+{: .prompt-info }
+
+
 Torch-TensorRT是一个结合了Pytorch和TensorRT的库，可以便捷地将torch模型转换为TensorRT推理模型，加速模型推理速度，而无需复杂的转换，和手动维护TensorRT的CUDA操作。然而，该库对Jetson Orin系列的支持年久失修，作者已经将修改提了个pull request，下面介绍手动编译安装该库的方法。
 
 > 最简单安装这些的方法是使用英伟达的pytorch docker，包含这些所有库。可以参考读者另一篇文章：[为jetson orin nx配置GPU版docker](../jetson-docker-gpu)

@@ -16,7 +16,7 @@ TensorRT是英伟达推出的推理加速库，可以加速英伟达显卡上模
 
 最简单的安装方式，是通过`pip`直接安装，但是这样安装会缺失`trtexec`转换程序，同时也难以切换版本，并且对于Jetson而言，许多版本无法直接安装。因此，本文全部使用源码安装（并不进行编译）。这样安装的另一个好处是，安装方法对Windows、Linux、Jetson都是一样的。只有设置环境变量的时候不甚相同。
 
-首先，访问[下载页面](https://developer.nvidia.com/tensorrt/download)，登录你的英伟达账号，并选择对应版本下载。这里本文选择最新的10.16版本（对于Jetson，使用10.7版本，新版本的SBSA的不再支持cuda12，Jetson用不了，它的driver是540，详见：[CUDA Compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)。~~但是如有必须，可以通过[CUDA Forward Compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/forward-compatibility.html)，安装对应的`cuda-compat-13-3`包，来尽量支持。~~**Jetson并没有对应的cuda-compat包**）。
+首先，访问[下载页面](https://developer.nvidia.com/tensorrt/download)，登录你的英伟达账号，并选择对应版本下载。这里本文选择最新的10.16版本（对于Jetson，使用10.7版本，新版本的SBSA的不再支持cuda12，Jetson用不了，它的driver是540，详见：[CUDA Compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)。~~但是如有必须，可以通过[CUDA Forward Compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/forward-compatibility.html)，安装对应的`cuda-compat-13-3`包，来尽量支持。Jetson并没有对应的cuda-compat包~~**Jetson Orin有对应的cuda-compat包了，并且最新的Jetpack 7.2+支持orin系列，提供了完全更新：参考[官方论坛](https://forums.developer.nvidia.com/t/test-run-public-wheels-cuda-13-2-jetson-orin-family/364497)、[compat包下载](https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/sbsa/)）。
 
 注意选择对应你的架构：
 ![alt text](assets/img/tensorrt-install/install_page.png)

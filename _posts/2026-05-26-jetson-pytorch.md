@@ -6,6 +6,9 @@ categories: [技术经验, 英伟达, Jetson Orin]
 tags: [nvidia, jetson orin nx, pytorch] # TAG 名称应始终为小写
 ---
 
+> 最新的Jetpack 7.2+增加了对orin的支持，并且提供了cuda13，将统一化为Linux SBSA格式。对应也有适用于jetpack 6.2的[cuda-compat-orin-13包](https://forums.developer.nvidia.com/t/test-run-public-wheels-cuda-13-2-jetson-orin-family/364497)
+{: .prompt-info }
+
 英伟达的Jetson系列边缘计算平台，集成了CPU与GPU，而所需要的GPU版本的Pytorch安装不能直接按照普通电脑安装的方式，有自己的一套安装方案。下面，本文将介绍jetson系列的GPU版本pytorch的安装。
 
 ## 一键预编译安装
