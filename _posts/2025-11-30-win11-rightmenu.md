@@ -129,6 +129,9 @@ Windows11规定，必须用打包项目将一个exe（无论是传统win32还是
 
 ## 传统win32应用+打包项目
 最简单的方式就是使用任何一个exe程序，一个编写好的继承了IExplorerCommand类与一个AppxManifest.xml文件实现。因此，这种实现方式的困难是实现一个IExplorerCommand类的dll和AppxManifest.xml文件的编写，我们一步一步来。
+
+首先再visual studio里新建一个DLL项目，要参考下面提到的GitHub仓库，把所需的头文件放进去。并且，还需要添加一个Source.def资源文件，把dll的接口导出。
+
 ### 编写DLL
 参考[IExplorerExamples](https://github.com/cjee21/IExplorerCommand-Examples)中的C++/Winrt实现，可以得到如下代码：
 

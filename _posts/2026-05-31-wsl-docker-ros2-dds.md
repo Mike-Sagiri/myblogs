@@ -141,3 +141,22 @@ export FASTRTPS_DEFAULT_PROFILES_FILE=/path/to/fastdds.xml
 </profiles>
 ```
 其中，`192.168.31.20`应改为你的wsl mirror网络的ip。
+
+## 更多探索
+有空拿wireshark抓了一下包，虽然具体问题机理仍然是wsl的mirror网络的问题，但是却发现了一些其他端倪。ros2把视频、雷达等大数据划分成了一个13.5KB的大UDP包，走eth的时候会触发分片。作者这里分成了十个。不知什么原因，这种wsl到wsl自机的网络流量丢包率十分高，这导致这些分片大部分都难以到达。由于分片的原因，大部分UDP包都无法恢复。这解释了为什么会严重卡顿。而至于为什么非分页缓冲区持续增长，可能是缓存了其他分片，也可能是hyper-v的bug，目前无从得知。
+
+那么，这也提示了一个不依赖lo网络接口的方法——限制包大小，这样虽然有一些丢包（UDP允许这样），但是却不会导致非分页缓冲区泄露与卡顿。
+
+```xml
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain Id="any">
+    <General>
+      <Interfaces>
+        <NetworkInterface name="eth0" priority="0"/>
+      </Interfaces>
+
+      <MaxMessageSize>1456 B</MaxMessageSize>
+      <MaxRexmitMessageSize>1456 B</MaxRexmitMessageSize>
+    </General>
+  </Domain>
+</CycloneDDS>
