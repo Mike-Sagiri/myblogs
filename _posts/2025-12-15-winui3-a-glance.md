@@ -16,9 +16,24 @@ mermaid: true
 **参考**：
 1. [Create Your Fisrt WinUI3 Project](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/create-your-first-winui3-app)
 2. [demo](https://github.com/Mike-Sagiri/icp_winui3)
+3. [Distribute an unpackaged WinUI 3 app](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/unpackage-winui-app?tabs=cpp)
 
 ## 创建项目
-请在Visual Studio里创建一个winui3（空白应用，已打包）项目。创建成功后，你需要做一些基础的设置。这里请参考[Create Your Fisrt WinUI3 Project](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/create-your-first-winui3-app)。我使用了不打包，也就是可以随时复制到其他Windows电脑上运行。如果你想让它发布并成功安装，请忽略这一条。
+请在Visual Studio里创建一个winui3（空白应用，已打包）项目。创建成功后，你需要做一些基础的设置。这里请参考[Create Your Fisrt WinUI3 Project](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/create-your-first-winui3-app)、[Distribute an unpackaged WinUI 3 app](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/unpackage-winui-app?tabs=cpp)。我使用了不打包，也就是可以随时复制到其他Windows电脑上运行。如果你想让它发布并成功安装，请忽略这一条。
+
+具体而言，如下修改你的.vcxproj文件：
+```xml
+<Project ...>
+  ...
+  <PropertyGroup Label="Globals">
+    ...
+    <AppxPackage>false</AppxPackage><!-- update this -->
+    <WindowsPackageType>None</WindowsPackageType><!-- add this -->
+    ...
+  </PropertyGroup> 
+  ...
+</Project>
+```
 
 ## 添加依赖项
 你需要右键项目->属性，将c++标准改为c++20。此外，在c/c++中，把eigen和nanoflann库的地址添加到附加包含目录里。最后，右键项目，管理nuget包，把c++/winrt, Windows Implementation Libraries, win2d都加到项目里。如果你直接克隆了demo仓库，请右键解决方案，还原nuget包。如果你不打包，请修改.vcxproj文件里的ApplicationIcon标签内容（注：许多反馈声称它并不改变app实际图标，目前存疑）
@@ -52,5 +67,8 @@ IAsyncAction DoWorkAsync(TextBlock textblock)
 
 ## 构建
 记得用release构建，那快得多。因为没用到Assets/，可以把它删了。同时一系列调试用的文件也可以删掉。但是如果你不选择打包的话，你需要[Windows App Runtime](https://apps.microsoft.com/detail/9pcmpl33xp5m?hl=zh-CN&gl=CN)，或者[Windows App SDK](https://learn.microsoft.com/en-us/windows/apps/windows-app-sdk/downloads)
+
+> 注意，新版本的winui3已无需手动操心这些依赖，参见[Distribute an unpackaged WinUI 3 app](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/unpackage-winui-app?tabs=cpp)
+{: .prompt-info }
 
 
