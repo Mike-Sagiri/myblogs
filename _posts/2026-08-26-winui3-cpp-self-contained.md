@@ -82,7 +82,7 @@ mermaid: true
 因此，[参考样例](https://github.com/microsoft/WindowsAppSDK-Samples/blob/43404afcc4e72294b3e2706d2eff12418dbb815a/Samples/SelfContainedDeployment/cpp-winui-unpackaged)，在项目里添加两个文本文件：`Directory.Build.props`、`HybridCRT.props`。
 
 **Directory.Build.props:**
-```txt
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildThisFileDirectory)HybridCRT.props" />
@@ -90,7 +90,7 @@ mermaid: true
 ```
 
 **HybridCRT.props:**
-```txt
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT License. See LICENSE in the project root for license information. -->
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -128,6 +128,7 @@ mermaid: true
 ```
 
 最终项目结构类似于：
+
 ![alt text](assets/img/winui3-selfcontained/project.png)
 _项目结构_
 
